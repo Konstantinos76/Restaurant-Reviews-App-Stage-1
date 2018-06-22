@@ -51,9 +51,8 @@ fetchRestaurantFromURL = (callback) => {
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   
   // Accessibility - Google map section
-  const mapSection = document.getElementById('map-container');
-  mapSection.setAttribute('role', 'application');
-  mapSection.setAttribute('aria-label', `Google map of ${restaurant.name} restaurant`);
+  const innerMap = document.getElementById('map');
+  innerMap.setAttribute('aria-label', `Google map of ${restaurant.name} restaurant`);
   // End of Accessibility - Google map section
 
   const name = document.getElementById('restaurant-name');
