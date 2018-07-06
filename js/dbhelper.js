@@ -8,27 +8,38 @@ class DBHelper {
    * Change this to restaurants.json file location on your server.
    */
   static get DATABASE_URL() {
-    const port = 8000 // Change this to your server port
-    return `http://localhost:${port}/data/restaurants.json`;
+    const port = 1337 // Change this to your server port
+    return `http://localhost:${port}/restaurants/`;
   }
 
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', DBHelper.DATABASE_URL);
-    xhr.onload = () => {
-      if (xhr.status === 200) { // Got a success response from server!
-        const json = JSON.parse(xhr.responseText);
-        const restaurants = json.restaurants;
-        callback(null, restaurants);
-      } else { // Oops!. Got an error from server.
-        const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
+    var dbPromise = idb.open('myIdb', 1, function(upgradeDb) {
+      var dbStore = upgradeDb.createObjectStore('dbStore');
+    });
+
+    fetch(DBHelper.DATABASE_URL)
+      .then(response => response.json())
+      .then(restaurants => {callback(null, restaurants);
+        writeToDb(restaurants); 
+      })
+      .catch('Request failed', null);
+    
+    function writeToDb(data) {
+      var i;
+      dbPromise.then(function(db) {
+      var tx = db.transaction('dbStore', 'readwrite');
+      var dbStore = tx.objectStore('dbStore');
+      for (i = 0; i < data.length; i++) {
+        dbStore.put(data[i], i);
       }
-    };
-    xhr.send();
+      return tx.complete;
+      }).then(function() {
+        console.log('Success Writting to Database!');
+        });
+    }
   }
 
   /**
@@ -150,7 +161,7 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}`);
+    return (`/img/${restaurant.photograph}.jpg`);
   }
 
   /**
