@@ -11,36 +11,40 @@ class DBHelper {
     const port = 1337 // Change this to your server port
     return `http://localhost:${port}/restaurants/`;
   }
-
+  
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    var dbPromise = idb.open('myIdb', 1, function(upgradeDb) {
-      var dbStore = upgradeDb.createObjectStore('dbStore');
-    });
-
     fetch(DBHelper.DATABASE_URL)
       .then(response => response.json())
-      .then(restaurants => {callback(null, restaurants);
-        writeToDb(restaurants); 
-      })
+      .then(restaurants => callback(null, restaurants))
       .catch('Request failed', null);
-    
-    function writeToDb(data) {
-      var i;
-      dbPromise.then(function(db) {
-      var tx = db.transaction('dbStore', 'readwrite');
-      var dbStore = tx.objectStore('dbStore');
-      for (i = 0; i < data.length; i++) {
-        dbStore.put(data[i], i);
-      }
-      return tx.complete;
-      }).then(function() {
-        console.log('Success Writting to Database!');
-        });
     }
-  }
+
+    /**
+   * Static method. Creates database and writes restaurants.
+   */
+    static createDbAndWriteRestaurants() {
+      var dbPromise = idb.open('myIdb', 1, function(upgradeDb) {
+        var dbStore = upgradeDb.createObjectStore('dbStore', {keyPath: 'id'})
+        });
+      fetch(DBHelper.DATABASE_URL)
+      .then(response => response.json())
+      .then(data => writeToDb(data));
+
+      function writeToDb(data) {
+        dbPromise.then(function(db){
+          if (!db) return;
+          var tx = db.transaction('dbStore', 'readwrite');
+          var dbStore = tx.objectStore('dbStore');
+          data.forEach(record => dbStore.put(record));
+          return tx.complete;
+        }).then(function() {
+          console.log('Success Writting to Database!');
+        });
+      }
+    }
 
   /**
    * Fetch a restaurant by its ID.
@@ -179,3 +183,8 @@ class DBHelper {
   }
 
 }
+
+/**
+   * static createDbAndWriteRestaurants method is called
+   */
+DBHelper.createDbAndWriteRestaurants();
