@@ -11,40 +11,66 @@ class DBHelper {
     const port = 1337 // Change this to your server port
     return `http://localhost:${port}/restaurants/`;
   }
-  
+
+  /**
+   * Opens Idb
+   */
+  static openIdb() {
+    var dbPromise = idb.open('myIdb', 1, function(upgradeDb) {
+      var dbStore = upgradeDb.createObjectStore('dbStore', {keyPath: 'id'})
+      });
+
+    return dbPromise;
+  }
+
+  /**
+   * Static method. Writes restaurants to database.
+   */
+  static createDbAndWriteRestaurants() {
+    if(navigator.onLine) {
+    fetch(DBHelper.DATABASE_URL)
+    .then(response => response.json())
+    .then(data => writeToDb(data));
+
+    function writeToDb(data) {
+      DBHelper.openIdb().then(function(db){
+        if (!db) return;
+        var tx = db.transaction('dbStore', 'readwrite');
+        var dbStore = tx.objectStore('dbStore');
+        data.forEach(record => dbStore.put(record));
+        return tx.complete;
+      }).then(function() {
+        console.log('Success Writting to Database!');
+      });
+    }}
+  }
+
   /**
    * Fetch all restaurants.
+   * If offline, from idb.
+   * If online, from server.
    */
   static fetchRestaurants(callback) {
+    if(!navigator.onLine) {
+      DBHelper.openIdb().then(function(db){
+        if(!db) return;
+        var tx = db.transaction('dbStore');
+        var dbStore = tx.objectStore('dbStore');
+
+        return dbStore.getAll();
+      }).then(function(idbdata){
+        callback(null, idbdata);
+        console.log('Data fetched from idb');
+      })
+    } else {
     fetch(DBHelper.DATABASE_URL)
       .then(response => response.json())
-      .then(restaurants => callback(null, restaurants))
+      .then(restaurants => {callback(null, restaurants); 
+        console.log('Data fetched from server');
+      })
       .catch('Request failed', null);
     }
-
-    /**
-   * Static method. Creates database and writes restaurants.
-   */
-    static createDbAndWriteRestaurants() {
-      var dbPromise = idb.open('myIdb', 1, function(upgradeDb) {
-        var dbStore = upgradeDb.createObjectStore('dbStore', {keyPath: 'id'})
-        });
-      fetch(DBHelper.DATABASE_URL)
-      .then(response => response.json())
-      .then(data => writeToDb(data));
-
-      function writeToDb(data) {
-        dbPromise.then(function(db){
-          if (!db) return;
-          var tx = db.transaction('dbStore', 'readwrite');
-          var dbStore = tx.objectStore('dbStore');
-          data.forEach(record => dbStore.put(record));
-          return tx.complete;
-        }).then(function() {
-          console.log('Success Writting to Database!');
-        });
-      }
-    }
+  }
 
   /**
    * Fetch a restaurant by its ID.
@@ -185,6 +211,6 @@ class DBHelper {
 }
 
 /**
-   * static createDbAndWriteRestaurants method is called
-   */
+ * static createDbAndWriteRestaurants method is called
+ */
 DBHelper.createDbAndWriteRestaurants();
