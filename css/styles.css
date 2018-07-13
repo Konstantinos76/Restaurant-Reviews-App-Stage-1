@@ -424,7 +424,7 @@ section {
 #footer,
 .inside #footer {
   background-color: #444;
-  color: #aaa;
+  color: #fff;
   letter-spacing: 1px;
   padding: 25px;
   text-align: center;
@@ -485,9 +485,22 @@ nav h1 a {
 
 /* ====================== Map ====================== */
 #map {
+  display: none;
   height: 400px;
   width: 100%;
   background-color: #ccc;
+}
+
+#mapButton {
+  width: 100%; 
+  font-size: 1.2em; 
+  padding: 10px;
+}
+
+#mapButton:hover {
+  cursor: pointer;
+  background-color: #3397db;
+  color: #fff;
 }
 
 /* ====================== Restaurant Filtering ====================== */
@@ -544,7 +557,7 @@ nav h1 a {
 }
 
 #restaurants-list li h3 {
-  color: #f18200;
+  color: #333;
   font-family: Arial,sans-serif;
   font-size: 1.4em;
   font-weight: 200;
@@ -560,7 +573,7 @@ nav h1 a {
 }
 
 #restaurants-list li a {
-  background-color: orange;
+  background-color: #333;
   color: #fff;
   display: inline-block;
   font-size: 1em;
@@ -581,7 +594,8 @@ nav h1 a {
 select:focus,
 nav h1 a:focus,
 footer a:focus,
-#breadcrumb a:focus {
+#breadcrumb a:focus,
+#mapButton:focus {
   outline: none;
   background-color: #ffee00;
   color: black;

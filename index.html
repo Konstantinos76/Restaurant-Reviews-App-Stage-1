@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
@@ -22,6 +22,7 @@
       <!-- Accessibility - Google map section  -->
       <div id="map" role="application" aria-labelledby="mapdescription"></div>
       <div hidden id="mapdescription">Google map showing the location off all selected restaurants</div>
+      <button type="button" id="mapButton" aria-label="Show restaurants in Google maps">Show Map</button>
       <!-- End of Accessibility - Google map section  -->
 
     </section>
@@ -61,8 +62,8 @@
   <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
   <script type="application/javascript" charset="utf-8" src="js/index.js"></script>
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxAII9f0khW4_p2_hNF9pp3nUcNiZW0fg&libraries=places&callback=initMap"></script>
-  <!-- <script type="application/javascript" charset="utf-8" src="js/database.js"></script> -->
-
+  <script type="application/javascript" charset="utf-8" src="js/showmap.js"></script>
+  
   <footer id="footer">
     Copyright (c) 2017 <a href="/"><strong>Restaurant Reviews</strong></a> <br>All Rights Reserved.
   </footer>
