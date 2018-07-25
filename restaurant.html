@@ -65,7 +65,32 @@
     <!-- end restaurant -->
     <!-- Beginning reviews -->
     <section id="reviews-container">
+      
+      <!-- Beginning form to add review -->
+      <h3 aria-label="Add your review for this restaurant.">Add your review</h3>
+      <form id="addReviewForm">
+        <p>Your name:</p> 
+        <input type="text" id='add-review-name-field' placeholder="Your name">
+        <br>
+        <p>Your rating:</p>
+        <select id="add-review-select-field">
+          <option selected="selected" disabled="disabled">All Star</option>
+          <option value="1">1 Star rating</option>
+          <option value="2">2 Star rating</option>
+          <option value="3">3 Star rating</option>
+          <option value="4">4 Star rating</option>
+          <option value="5">5 Star rating</option>
+        </select>
+        <br>
+        <p>Your comments:</p>
+        <textarea id="add-review-textfield" rows="4" cols="50" placeholder="Your comments"></textarea>
+        <br>
+        <input type="submit" value="Submit">
+      </form>
+      <!-- End of form to add review -->
+      
       <ul id="reviews-list"></ul>
+
     </section>
     <!-- End reviews -->
   </main>
@@ -90,7 +115,39 @@
   <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_tKbW6A5pQ-eupxI56myUnHLqYCzOjKo&libraries=places&callback=initMap"></script> -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxAII9f0khW4_p2_hNF9pp3nUcNiZW0fg&libraries=places&callback=initMap"></script>
   <!-- End scripts -->
+  <script>
+    document.getElementById("addReviewForm").addEventListener("submit", function() {
+      let url = window.location.href;
+      let urlStringLength = window.location.href.length;
+    
+      let restaurantId = url.charAt(urlStringLength-1);
+      let name = document.getElementById('add-review-name-field').value;
+      let rating = document.getElementById('add-review-select-field').value;
+      let comments = document.getElementById('add-review-textfield').value;
+    
+      let data = {
+        "restaurant_id": restaurantId,
+        "name": name,
+        "rating": rating,
+        "comments": comments
+      };
 
+      fetch('http://localhost:1337/reviews/', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(function(response) {
+        response.json();
+      }).catch(function(error) {
+        console.error('Error:', error);
+      }).then(function(res) {
+        console.log('Success:', res);
+        window.location.href = url;
+      });
+    })
+  </script>
 </body>
 
 </html>
