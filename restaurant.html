@@ -116,11 +116,43 @@
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxAII9f0khW4_p2_hNF9pp3nUcNiZW0fg&libraries=places&callback=initMap"></script>
   <!-- End scripts -->
   <script>
-    document.getElementById("addReviewForm").addEventListener("submit", function() {
-      let url = window.location.href;
-      let urlStringLength = window.location.href.length;
+    const url = window.location.href;
+    const urlStringLength = window.location.href.length;
+    const restaurantId = url.charAt(urlStringLength-1);
+
+    function fetchReviews() {
+      let htmlContent = '';
+      const reviewsul = document.querySelector('#reviews-list');
+
+      fetch(`http://localhost:1337/reviews/?restaurant_id=${restaurantId}`)
+        .then(response => response.json())
+        .then(showReviews)
+        .catch(err => requestError(err));
+
+      function showReviews(data) {
+        if(data && data.length > 1) {
+          const reviews = data;
+          htmlContent = reviews.map(review => `<li>
+          <p>${review.name}</p>
+          <p>${review.createdAt}</p>
+          <p>Rating: ${review.rating}</p>
+          <p>${review.comments}</p>
+          </li>`).join('');
+        } else {
+        htmlContent = '<div>No reviews for this restaurant</div>';
+        }
+      reviewsul.insertAdjacentHTML('beforeend', htmlContent);
+      }
+
+      function requestError(err) {
+        console.log(err);
+        reviewsul.insertAdjacentHTML('beforeend', '<div>Network: Error fetching reviews.');
+      }
+    }
+
+    fetchReviews();
     
-      let restaurantId = url.charAt(urlStringLength-1);
+    document.getElementById("addReviewForm").addEventListener("submit", function() {
       let name = document.getElementById('add-review-name-field').value;
       let rating = document.getElementById('add-review-select-field').value;
       let comments = document.getElementById('add-review-textfield').value;
@@ -131,22 +163,17 @@
         "rating": rating,
         "comments": comments
       };
-
       fetch('http://localhost:1337/reviews/', {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {
           'Content-Type': 'application/json'
         }
-      }).then(function(response) {
-        response.json();
-      }).catch(function(error) {
-        console.error('Error:', error);
-      }).then(function(res) {
-        console.log('Success:', res);
-        window.location.href = url;
-      });
-    })
+      }).then(res => res.json())
+        .then(function() {
+          window.location.href = url;
+        })
+    });
   </script>
 </body>
 

@@ -114,19 +114,21 @@ fillRestaurantHoursHTML = (operatingHours = self.restaurant.operating_hours) => 
  */
 fillReviewsHTML = (reviews = self.restaurant.reviews) => {
   const container = document.getElementById('reviews-container');
+  const reviewslist = document.getElementById('reviews-list');
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
-  
+
   // Accessibility - Reviews
   title.setAttribute("aria-label", "Reviews, what people say about this restaurant.");
   // End of Accessibility - Reviews
 
   container.appendChild(title);
+  container.appendChild(reviewslist);
 
   if (!reviews) {
     const noReviews = document.createElement('p');
     noReviews.innerHTML = 'No reviews yet!';
-    container.appendChild(noReviews);
+    // container.appendChild(noReviews);
     return;
   }
   const ul = document.getElementById('reviews-list');
