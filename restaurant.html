@@ -67,25 +67,22 @@
     <section id="reviews-container">
       
       <!-- Beginning form to add review -->
-      <h3 aria-label="Add your review for this restaurant.">Add your review</h3>
-      <form id="addReviewForm">
-        <p>Your name:</p> 
-        <input type="text" id='add-review-name-field' placeholder="Your name">
-        <br>
-        <p>Your rating:</p>
+      <button type="button" role="button" id="favorite-button-badge">Add to my favorites</button>
+      <h3>Add your review</h3>
+      <form id="addReviewForm" aria-label="Use this form to add your own review for this restaurant.">
+        <label for="add-review-name-field">Your name:</label>
+        <input type="text" id="add-review-name-field" placeholder="Your name">
+        <label for="add-review-select-field">Your rating:</label>
         <select id="add-review-select-field">
-          <option selected="selected" disabled="disabled">All Star</option>
-          <option value="1">1 Star rating</option>
-          <option value="2">2 Star rating</option>
-          <option value="3">3 Star rating</option>
+          <option selected="selected" value="5">5 Star rating</option>
           <option value="4">4 Star rating</option>
-          <option value="5">5 Star rating</option>
+          <option value="3">3 Star rating</option>
+          <option value="2">2 Star rating</option>
+          <option value="1">1 Star rating</option>
         </select>
-        <br>
-        <p>Your comments:</p>
-        <textarea id="add-review-textfield" rows="4" cols="50" placeholder="Your comments"></textarea>
-        <br>
-        <input type="submit" value="Submit">
+        <label for="add-review-textfield">Your comments:</label>
+        <textarea id="add-review-textfield" placeholder="Your comments"></textarea>
+        <input type="submit" id="add-review-btn" value="Add Review">
       </form>
       <!-- End of form to add review -->
       
@@ -151,6 +148,56 @@
     }
 
     fetchReviews();
+
+    function fetchRestaurantById() {
+      fetch(`http://localhost:1337/restaurants/${restaurantId}`)
+        .then(response => response.json())
+        .then(isFavorite)
+        .catch(err => requestError(err));
+
+      function isFavorite(restaurant) {
+        const favButton = document.getElementById('favorite-button-badge');
+        if(restaurant.is_favorite == "true" || restaurant.is_favorite == true) {
+          favButton.style.backgroundColor = 'green';
+          favButton.innerHTML = 'Your Favorite &starf;';
+          favButton.setAttribute('aria-label', 'You have marked this restaurant as one of your favorites. Tap to unfavorite');
+        }
+        else {
+          favButton.style.backgroundColor = '#333';
+          favButton.innerHTML = 'ADD TO MY FAVORITES';
+          favButton.setAttribute('aria-label', 'This restaurant is not one of your favorites, yet. Tap to add to your favorites');
+        }
+      }
+
+      function requestError(err) {
+        console.log(err);
+      }
+    }
+
+    fetchRestaurantById();
+
+    document.getElementById("favorite-button-badge").addEventListener("click", function() {
+      let favButtonText = this.innerHTML;
+      // This if statement will check wether the button contains the word 'YOUR'
+      // part of the phrase 'YOUR FAVORITE'. This means the user has already
+      // selected restaurant as favorite. If this is the case, this new click
+      // will now unfavorite the restaurant.
+      if (favButtonText.match(/your/i)) {
+        fetch(`http://localhost:1337/restaurants/${restaurantId}/?is_favorite=false`, {
+          method: 'PUT'
+        }).then(function(){
+          fetchRestaurantById();
+          console.log('Successfully removed restaurant from favorites');
+        })
+      } else {
+      fetch(`http://localhost:1337/restaurants/${restaurantId}/?is_favorite=true`, {
+        method: 'PUT'
+      }).then(function(){
+        fetchRestaurantById();
+        console.log('Successfully added restaurant to favorites');
+        })
+      }
+    });
     
     document.getElementById("addReviewForm").addEventListener("submit", function() {
       let name = document.getElementById('add-review-name-field').value;
@@ -163,6 +210,7 @@
         "rating": rating,
         "comments": comments
       };
+      
       fetch('http://localhost:1337/reviews/', {
         method: 'POST',
         body: JSON.stringify(data),

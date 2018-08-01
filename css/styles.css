@@ -115,6 +115,11 @@
     font-size: 1.5em;
     padding: 10px;
   }
+
+  #reviews-container form {
+    width: calc(100%-20px);
+    margin-bottom: 20px;
+  }
 }
 
 /* Media queries - medium viewport */
@@ -204,6 +209,11 @@
   #reviews-container h3 {
     font-size: 1.5em;
     padding: 10px;
+  }
+
+  #reviews-container form {
+    width: calc(100%-20px);
+    margin-bottom: 20px;
   }
 }
 
@@ -295,6 +305,11 @@
   #reviews-container h3 {
     font-size: 1.8em;
     padding: 15px 10px 15px 10px;
+  }
+
+  #reviews-container form {
+    width: 50%;
+    margin-bottom: 20px;
   }
 }
 
@@ -595,7 +610,9 @@ select:focus,
 nav h1 a:focus,
 footer a:focus,
 #breadcrumb a:focus,
-#mapButton:focus {
+#mapButton:focus,
+#reviews-container form #add-review-name-field:focus,
+#reviews-container form textarea:focus {
   outline: none;
   background-color: #ffee00;
   color: black;
@@ -618,6 +635,33 @@ footer a:focus,
   background-color: #ccc;
   height: 400px;
   width: 100%;
+}
+
+#favorite-button-badge {
+  float: right;
+  height: 40px;
+  margin: 20px 10px 0 10px;
+  background-color: #333;
+  color: #fff;
+  font-size: 1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 8px;
+  letter-spacing: 0;
+}
+
+#favorite-button-badge:hover {
+  cursor: pointer;
+  background-color: #3397db !important;
+  box-shadow: 3px 3px 3px #888888; 
+}
+
+#favorite-button-badge:focus {
+  outline: none;
+  background-color: #ffee00 !important;
+  color: black;
+  box-shadow: 3px 3px 3px #888888;
+  text-shadow: 2px 2px 2px #aaa;
 }
 
 #restaurant-name {
@@ -663,8 +707,42 @@ footer a:focus,
   letter-spacing: -1px;
 }
 
-#reviews-container form {
-  margin-bottom: 20px;
+#reviews-container form label {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+#reviews-container form #add-review-name-field,
+#reviews-container form select,
+#reviews-container form textarea {
+  width: 100%;
+  margin: 0 0 15px 0;
+  font-size: 15px;
+}
+
+#reviews-container form #add-review-name-field,
+#reviews-container form select {
+  height: 30px;
+}
+
+#reviews-container form textarea {
+  height: 60px;
+}
+
+#reviews-container form #add-review-btn {
+  height: 40px;
+  background-color: #333;
+  color: white;
+  padding: 8px;
+  font-size: 1em;
+  text-transform: uppercase;
+}
+
+#reviews-container form #add-review-btn:hover {
+  cursor: pointer;
+  background-color: #3397db;
+  box-shadow: 3px 3px 3px #888888; 
 }
 
 #reviews-list {
