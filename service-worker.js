@@ -5,9 +5,11 @@ self.addEventListener('install', function(event) {
         '/restaurant.html',
         'css/styles.css',
         'js/dbhelper.js',
+        'js/idb.js',
         'js/index.js',
         'js/main.js',
         'js/restaurant_info.js',
+        'js/showmap.js',
         'img/1.webp',
         'img/2.webp',
         'img/3.webp',
@@ -30,7 +32,7 @@ self.addEventListener('install', function(event) {
         'img/10.jpg'
     ]
     event.waitUntil(
-        caches.open('cache-v2').then(function(cache) {
+        caches.open('cache-v3').then(function(cache) {
             return cache.addAll(urlsToCache);
         })
     );

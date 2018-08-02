@@ -118,7 +118,6 @@
 
   #reviews-container form {
     width: calc(100%-20px);
-    margin-bottom: 20px;
   }
 }
 
@@ -213,7 +212,6 @@
 
   #reviews-container form {
     width: calc(100%-20px);
-    margin-bottom: 20px;
   }
 }
 
@@ -309,7 +307,6 @@
 
   #reviews-container form {
     width: 50%;
-    margin-bottom: 20px;
   }
 }
 
@@ -705,6 +702,10 @@ footer a:focus,
   color: #f58500;
   font-weight: 300;
   letter-spacing: -1px;
+}
+
+#reviews-container form {
+  margin-bottom: 20px;
 }
 
 #reviews-container form label {
