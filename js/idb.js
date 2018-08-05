@@ -244,7 +244,7 @@
   // TODO: remove this once browsers do the right thing with promises
   ['openCursor', 'openKeyCursor'].forEach(function(funcName) {
     [ObjectStore, Index].forEach(function(Constructor) {
-      // Don't create iterateKeyCursor if openKeyCursor doesn't exist
+      // Don't create iterateKeyCursor if openKeyCursor doesn't exist.
       if (!(funcName in Constructor.prototype)) return;
 
       Constructor.prototype[funcName.replace('open', 'iterate')] = function() {

@@ -9,6 +9,7 @@ self.addEventListener('install', function(event) {
         'js/index.js',
         'js/main.js',
         'js/restaurant_info.js',
+        'js/reviews.js',
         'js/showmap.js',
         'img/1.webp',
         'img/2.webp',

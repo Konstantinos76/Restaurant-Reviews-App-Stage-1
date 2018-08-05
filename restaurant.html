@@ -108,14 +108,18 @@
   <script type="text/javascript" src="js/dbhelper.js"></script>
   <!-- Main javascript file -->
   <script type="text/javascript" src="js/restaurant_info.js"></script>
+  <!-- Javascript file that controls reviews and favorite/unfavorite -->
+  <script type="text/javascript" src="js/reviews.js"></script>
   <!-- Google Maps -->
   <!-- <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA_tKbW6A5pQ-eupxI56myUnHLqYCzOjKo&libraries=places&callback=initMap"></script> -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxAII9f0khW4_p2_hNF9pp3nUcNiZW0fg&libraries=places&callback=initMap"></script>
   <!-- End scripts -->
-  <script>
+  <!-- <script>
+
     const url = window.location.href;
     const urlStringLength = window.location.href.length;
     const restaurantId = url.charAt(urlStringLength-1);
+    const restaurantIdNumber = parseInt(restaurantId);
 
     function fetchReviews() {
       let htmlContent = '';
@@ -205,24 +209,38 @@
       let comments = document.getElementById('add-review-textfield').value;
     
       let data = {
-        "restaurant_id": restaurantId,
+        "id": Math.floor(Math.random() * 1000) + 30,
+        "restaurant_id": restaurantIdNumber,
         "name": name,
         "rating": rating,
         "comments": comments
       };
-      
-      fetch('http://localhost:1337/reviews/', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(res => res.json())
-        .then(function() {
+
+      if(!navigator.onLine) {
+        DBHelper.openIdb().then(function(db) {
+          if(!db) return;
+          var tx = db.transaction('reviewsStore', 'readwrite');
+          var reviewsStore = tx.objectStore('reviewsStore');
+          reviewsStore.put(data);
+          return tx.complete;
+        }).then(function() {
+          console.log('Successfully wrote review to idb while offline');
           window.location.href = url;
         })
+      } else {
+          fetch('http://localhost:1337/reviews/', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }).then(res => res.json())
+            .then(function() {
+              window.location.href = url;
+        })
+      }
     });
-  </script>
+  </script> -->
 </body>
 
 </html>

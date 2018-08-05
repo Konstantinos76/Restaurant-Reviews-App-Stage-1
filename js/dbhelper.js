@@ -12,14 +12,26 @@ class DBHelper {
     return `http://localhost:${port}/restaurants/`;
   }
 
+  static get DATABASE_REVIEWS_URL() {
+    const port = 1337 // Change this to your server port
+    return `http://localhost:${port}/reviews/?limit=1000`;
+  }
+
   /**
    * Opens Idb
    */
   static openIdb() {
-    var dbPromise = idb.open('myIdb', 1, function(upgradeDb) {
-      var dbStore = upgradeDb.createObjectStore('dbStore', {keyPath: 'id'})
-      });
-
+    var dbPromise = idb.open('myIdb', 6, function(upgradeDb) {
+      switch(upgradeDb.oldVersion) {
+        case 0:
+          var dbStore = upgradeDb.createObjectStore('dbStore', {keyPath: 'id'});
+        case 1:
+          upgradeDb.createObjectStore('reviewsStore', {keyPath: 'id'});
+        case 2:
+          var reviewsStore = upgradeDb.transaction.objectStore('reviewsStore');
+          reviewsStore.createIndex(restaurantId, 'restaurant_id');
+      }
+    });
     return dbPromise;
   }
 
@@ -40,7 +52,30 @@ class DBHelper {
         data.forEach(record => dbStore.put(record));
         return tx.complete;
       }).then(function() {
-        console.log('Success Writting to Database!');
+        console.log('Success Writting Restaurants to Database!');
+      });
+    }}
+  }
+
+  /**
+   * Static method. Writes reviews to database.
+   */
+  static writeReviewsToIdb() {
+    if(navigator.onLine) {
+    fetch(DBHelper.DATABASE_REVIEWS_URL)
+    .then(response => response.json())
+    .then(data => writeToDb(data));
+
+    function writeToDb(data) {
+      DBHelper.openIdb().then(function(db){
+        if (!db) return;
+        var tx = db.transaction('reviewsStore', 'readwrite');
+        var reviewsStore = tx.objectStore('reviewsStore');
+        var restaurantIndex = reviewsStore.index('restaurantId');
+        data.forEach(record => reviewsStore.put(record));
+        return tx.complete;
+      }).then(function() {
+        console.log('Success Writting Reviews to Database!');
       });
     }}
   }
@@ -214,3 +249,9 @@ class DBHelper {
  * static createDbAndWriteRestaurants method is called
  */
 DBHelper.createDbAndWriteRestaurants();
+
+/**
+ * static writeReviewsToIdb method is called
+ */
+DBHelper.writeReviewsToIdb();
+
