@@ -22,7 +22,6 @@ function fetchReviews() {
 
         return restaurantIndex.getAll(restaurantIdNumber);
       }).then(function(idbdata) {
-        //   console.log(idbdata);
           showReviews(idbdata);
           console.log('Fetched reviews from idb');
       });

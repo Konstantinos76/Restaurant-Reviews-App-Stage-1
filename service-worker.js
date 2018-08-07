@@ -1,3 +1,6 @@
+self.importScripts('./js/idb.js');
+self.importScripts('./js/dbhelper.js');
+
 self.addEventListener('install', function(event) {
     var urlsToCache = [
         '/',
@@ -33,7 +36,7 @@ self.addEventListener('install', function(event) {
         'img/10.jpg'
     ]
     event.waitUntil(
-        caches.open('cache-v3').then(function(cache) {
+        caches.open('cache-v8').then(function(cache) {
             return cache.addAll(urlsToCache);
         })
     );
@@ -47,3 +50,38 @@ self.addEventListener('fetch', function(event) {
         })
     );
 });
+
+self.addEventListener('sync', function(event) {
+    if (event.tag == 'myFirstSync') {
+      event.waitUntil(sendMessageToClient());
+    }
+});
+
+function sendMessageToClient() {
+    DBHelper.openIdb().then(function(db) {
+        if(!db) return;
+        var tx = db.transaction('reviewsStore');
+        var reviewsStore = tx.objectStore('reviewsStore');
+
+        return reviewsStore.getAll();
+    }).then(function(idbdata) {
+        writeBackToServer(idbdata);
+    });
+
+    function writeBackToServer(data) {
+        data.forEach(record => {
+            if(record.addedOffline === true) {
+                fetch('http://localhost:1337/reviews/', {
+                    method: 'POST',
+                    body: JSON.stringify(record),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }).then(res => res.json())
+                  .then(function() {
+                    console.log('Successfully synchronized reviews that added while user was offline');
+                  })
+            }
+        });
+    }
+}
