@@ -21,7 +21,7 @@ class DBHelper {
    * Opens Idb
    */
   static openIdb() {
-    var dbPromise = idb.open('myIdb', 9, function(upgradeDb) {
+    var dbPromise = idb.open('myIdb', 10, function(upgradeDb) {
       switch(upgradeDb.oldVersion) {
         case 0:
           var dbStore = upgradeDb.createObjectStore('dbStore', {keyPath: 'id'});
@@ -30,7 +30,6 @@ class DBHelper {
         case 2:
           var reviewsStore = upgradeDb.transaction.objectStore('reviewsStore');
           reviewsStore.createIndex('restaurantId', 'restaurant_id');
-          reviewsStore.createIndex('offline', 'addedOffline');
       }
     });
     return dbPromise;

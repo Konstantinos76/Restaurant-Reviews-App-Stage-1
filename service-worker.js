@@ -53,11 +53,11 @@ self.addEventListener('fetch', function(event) {
 
 self.addEventListener('sync', function(event) {
     if (event.tag == 'myFirstSync') {
-      event.waitUntil(sendMessageToClient());
+      event.waitUntil(syncIdbWithServer());
     }
 });
 
-function sendMessageToClient() {
+function syncIdbWithServer() {
     DBHelper.openIdb().then(function(db) {
         if(!db) return;
         var tx = db.transaction('reviewsStore');
@@ -65,23 +65,50 @@ function sendMessageToClient() {
 
         return reviewsStore.getAll();
     }).then(function(idbdata) {
-        writeBackToServer(idbdata);
+        // writeBackToServer(idbdata);
+        updateRecord(idbdata);
     });
 
-    function writeBackToServer(data) {
-        data.forEach(record => {
-            if(record.addedOffline === true) {
-                fetch('http://localhost:1337/reviews/', {
-                    method: 'POST',
-                    body: JSON.stringify(record),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                }).then(res => res.json())
-                  .then(function() {
-                    console.log('Successfully synchronized reviews that added while user was offline');
-                  })
-            }
+    function updateRecord(data) {
+        DBHelper.openIdb().then(function(db){
+            if(!db) return;
+            var tx = db.transaction('reviewsStore', 'readwrite');
+            var reviewsStore = tx.objectStore('reviewsStore');
+            data.forEach(record => {
+                if(record.addedOffline === true && navigator.onLine) {
+                    record.addedOffline = false;
+                    reviewsStore.put(record);
+                    writeBackToServer(record);
+
+                //     fetch('http://localhost:1337/reviews/', {
+                //     method: 'POST',
+                //     body: JSON.stringify(record),
+                //     headers: {
+                //         'Content-Type': 'application/json'
+                //     }
+                // }).then(res => res.json())
+                //   .then(function() {
+                //     console.log('Successfully synchronized review(s)');
+                //   })
+
+                    return tx.complete;
+                }
+            })
+        }).then(function() {
+            console.log('Item(s) updated!');
         });
+
+    function writeBackToServer(record) {
+        fetch('http://localhost:1337/reviews/', {
+                method: 'POST',
+                body: JSON.stringify(record),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => res.json())
+              .then(function() {
+                console.log('Successfully synchronized review(s)');
+                })
+        };
     }
 }
