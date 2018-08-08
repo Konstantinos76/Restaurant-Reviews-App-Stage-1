@@ -57,6 +57,11 @@ self.addEventListener('sync', function(event) {
     }
 });
 
+// When review object is created, there is a flag property called addedOffline.
+// The property has a value of true when user adds the review offline
+// and a value of false when user adds a review online.
+// The functions below utilize this flag property to get the records that were written offline, 
+// post them to server and update the database.
 function syncIdbWithServer() {
     DBHelper.openIdb().then(function(db) {
         if(!db) return;
@@ -65,7 +70,6 @@ function syncIdbWithServer() {
 
         return reviewsStore.getAll();
     }).then(function(idbdata) {
-        // writeBackToServer(idbdata);
         updateRecord(idbdata);
     });
 

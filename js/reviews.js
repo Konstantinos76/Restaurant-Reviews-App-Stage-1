@@ -3,6 +3,9 @@ const urlStringLength = window.location.href.length;
 const restaurantId = url.charAt(urlStringLength-1);
 const restaurantIdNumber = parseInt(restaurantId);
 
+//If user is online, data are pulled from server and populate 
+// the reviews section in restaurant.html. 
+//If user is offline, data are pulled from database.
 function fetchReviews() {
   let htmlContent = '';
   const reviewsul = document.querySelector('#reviews-list');
@@ -57,7 +60,9 @@ function fetchRestaurantById() {
       .then(isFavorite)
       .catch(err => requestError(err));
   }
-    
+  
+  // When restaurant.html is loaded, this function will check whether the specific restaurant 
+  // is user's favorite or not. It will adjust favorite button's appearance and text, accordingly.
   function isFavorite(restaurant) {
     const favButton = document.getElementById('favorite-button-badge');
     if(restaurant.is_favorite == "true" || restaurant.is_favorite == true) {
@@ -79,6 +84,8 @@ function fetchRestaurantById() {
 
 fetchRestaurantById();
 
+// Event listener attached to favorite button.
+// This button is the UI element that allows users to favorite/unfavorite a restaurant.
 document.getElementById("favorite-button-badge").addEventListener("click", function() {
   let favButtonText = this.innerHTML;
   // This if statement will check wether the button contains the word 'YOUR'
@@ -102,6 +109,10 @@ document.getElementById("favorite-button-badge").addEventListener("click", funct
   }
 });
 
+//Collects data from form. 
+//Creates the object representing a review
+//and writes to idb, if user is offline
+//or posts to server, if user is online.
 document.getElementById("addReviewForm").addEventListener("submit", function() {
   let name = document.getElementById('add-review-name-field').value;
   let rating = document.getElementById('add-review-select-field').value;
