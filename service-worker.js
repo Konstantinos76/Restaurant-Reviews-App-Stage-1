@@ -79,18 +79,6 @@ function syncIdbWithServer() {
                     record.addedOffline = false;
                     reviewsStore.put(record);
                     writeBackToServer(record);
-
-                //     fetch('http://localhost:1337/reviews/', {
-                //     method: 'POST',
-                //     body: JSON.stringify(record),
-                //     headers: {
-                //         'Content-Type': 'application/json'
-                //     }
-                // }).then(res => res.json())
-                //   .then(function() {
-                //     console.log('Successfully synchronized review(s)');
-                //   })
-
                     return tx.complete;
                 }
             })
